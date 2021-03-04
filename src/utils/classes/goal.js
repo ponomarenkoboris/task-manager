@@ -1,4 +1,5 @@
 export class Goal {
+
     constructor(priority, name, tasks = []) {
         this.priority = priority;
         this.name = name;
@@ -7,6 +8,10 @@ export class Goal {
 
     test(indx) {
         alert(indx)
+    }
+
+    returnTasks() {
+        return this.tasks
     }
 
     createTask(newTask) {

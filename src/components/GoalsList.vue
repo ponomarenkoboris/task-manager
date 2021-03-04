@@ -5,12 +5,12 @@
             <button class="new-goal-btn" @click="showForm">Create new</button>
         </div>
         <article class="main-card__goals-list">
-            <div class="goal-wrapper" v-for="(goal, idx) in number" :key="idx">
+            <div class="goal-wrapper" v-for="(goal, idx) in goals" :key="idx">
                 <div class="goal-priority-wrapper">
-                    <p class="goal-priority">PRIORITY</p>
+                    <p class="goal-priority">{{ goal.priority }}</p>
                 </div>
                 <div class="goal-text-wrapper">
-                    <p class="goal-text">TEXT</p>
+                    <p class="goal-text">{{ goal.name }}</p>
                 </div>
                 <div class="goal-percentage-of-completion-wrapper">
                     <p class="goal-percentage">58%</p>
@@ -18,13 +18,14 @@
             </div>
         </article>
     </article>
-    <UniversalForm v-if="formController" @close="showForm" :appointment="'New Goal Is Here!'"/>
+    <UniversalForm v-if="formController" @close="showForm" :appointment="'Creat new Goal!'"/>
 </template>
 
 <script>
 import { Goal } from '../utils/classes/goal.js';
 import UniversalForm from '../components/UniversalForm';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
 
 export default {
     name: 'GoalsList',
@@ -32,7 +33,7 @@ export default {
         UniversalForm
     },
     setup() {
-        const number = 10;
+        const store = useStore();
         const formController = ref(false);
         
         function testMove (idx) {
@@ -45,10 +46,10 @@ export default {
         }
 
         return {
-            number,
             testMove,
             formController,
-            showForm
+            showForm,
+            goals: computed(() => store.getters.goals)
         }
     }
 }
