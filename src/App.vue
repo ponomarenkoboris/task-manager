@@ -15,8 +15,7 @@ body {
   margin: 0;
 }
 #application {
-  color: #fff;
-  background: linear-gradient(to bottom left, #3f3f3f, #313131);
+  color: #000;
   height: 700px;
   font-family: 'Roboto';
 }

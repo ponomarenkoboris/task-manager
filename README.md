@@ -1,3 +1,3 @@
-##Cool open source Task Manager
+## Cool open source Task Manager
 
 #### Now in development

@@ -2,7 +2,7 @@
   "name": "task-manager",
   "version": "0.1.0",
   "description": "Cool task manager",
-  "author": "Boris Ponomarenko",
+  "author": "Boris Ponomarenko <borisponomarenko.dmi@gmail.com>",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --open",

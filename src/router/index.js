@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import TaskTracker from "../views/TaskTracker.vue";
-import Login from "../views/Login.vue";
-import Registration from "../views/Registration.vue";
+import Login from '../views/Login.vue';
+import Registration from '../views/Registration.vue';
 import EmptyLayout from '../layouts/EmptyLayout';
 
 const routes = [
@@ -11,7 +11,7 @@ const routes = [
     component: TaskTracker
   },
   {
-    path: '/welcomToAppTS/:action',
+    path: '/welcomToAppTS',
     name: 'EmptyLayout',
     component: EmptyLayout,
     children: [
@@ -22,12 +22,11 @@ const routes = [
       },
       {
         path: "signup",
-        name: "SignUp",
+        name : 'SignUp',
         component: Registration,
       },
     ]
-  }
-  
+  }  
 ];
 
 const router = createRouter({

@@ -1,24 +1,26 @@
 <template>
-    <article class="main-card">
-        <div class="main-card-title-wrapper">
-            <p class="main-card__title">Goals</p>
-            <button class="new-goal-btn" @click="showForm">Create new</button>
-        </div>
-        <article class="main-card__goals-list">
-            <div class="goal-wrapper" v-for="(goal, idx) in goals" :key="idx">
-                <div class="goal-priority-wrapper">
-                    <p class="goal-priority">{{ goal.priority }}</p>
-                </div>
-                <div class="goal-text-wrapper">
-                    <p class="goal-text">{{ goal.name }}</p>
-                </div>
-                <div class="goal-percentage-of-completion-wrapper">
-                    <p class="goal-percentage">58%</p>
-                </div>
+    <section id="goals-list">
+        <article class="main-card">
+            <div class="main-card-title-wrapper">
+                <p class="main-card__title">Goals</p>
+                <button class="new-goal-btn" @click="showForm">Create new</button>
             </div>
+            <article class="main-card__goals-list">
+                <div class="goal-wrapper" v-for="(goal, idx) in goals" :key="idx" @click="testMove(goal)">
+                    <div class="goal-priority-wrapper">
+                        <p class="goal-priority">{{ goal.priority }}</p>
+                    </div>
+                    <div class="goal-text-wrapper">
+                        <p class="goal-text">{{ goal.name }}</p>
+                    </div>
+                    <div class="goal-percentage-of-completion-wrapper">
+                        <p class="goal-percentage">58%</p>
+                    </div>
+                </div>
+            </article>
         </article>
-    </article>
-    <UniversalForm v-if="formController" @close="showForm" :appointment="'Creat new Goal!'"/>
+        <UniversalForm v-if="formController" @close="showForm" :appointment="'Creat new Goal!'"/>
+    </section>
 </template>
 
 <script>
@@ -35,10 +37,13 @@ export default {
     setup() {
         const store = useStore();
         const formController = ref(false);
+        const goals = computed(() => {
+            return store.getters.goals.map(item => new Goal(item.id, item.priority, item.name, item.tasks));
+        });
         
-        function testMove (idx) {
-            const testClass = new Goal();
-            testClass.test(idx)
+        function testMove (choosenGoal) {
+            choosenGoal.testMethod();
+
         }
 
         function showForm() {
@@ -49,7 +54,7 @@ export default {
             testMove,
             formController,
             showForm,
-            goals: computed(() => store.getters.goals)
+            goals
         }
     }
 }
@@ -63,7 +68,7 @@ export default {
     align-items: center;
     justify-content: flex-start;
     border-radius: 20px;
-    border: 1px solid #fff;
+    border: 1px solid #ccc;
 
     .main-card-title-wrapper {
         display: flex;
@@ -71,7 +76,7 @@ export default {
         align-items: center;
         width: 100%;
         text-align: center;
-        border-bottom: 3px solid #fff;
+        border-bottom: 3px solid #ccc;
 
         .main-card__title {
             text-transform: uppercase;
@@ -81,7 +86,7 @@ export default {
         .new-goal-btn {
             cursor: pointer;
             padding: 5px 10px;
-            color: #fff;
+            color: #000;
             background: none;
             border: none;
             border-radius: 20px;
@@ -101,7 +106,7 @@ export default {
         .goal-wrapper {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid #fff;
+            border-bottom: 1px solid #ccc;
 
             .goal-priority-wrapper,
             .goal-percentage-of-completion-wrapper {

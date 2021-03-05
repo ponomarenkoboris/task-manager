@@ -6,8 +6,9 @@
                 <p @click="$emit('close')" class="close-card-icon">&times;</p>
             </div>
             <div class="form-wrapper">
-                <input type="text" v-model="values.field1" placeholder="First Input">
-                <input type="text" v-model="values.field2" placeholder="Second Input">
+                <input type="text" class="new-goal__name" v-model="newGoal.goalName" placeholder="Goal name">
+                <input type="number" class="new-goal__priority" v-model="newGoal.goalPriority" placeholder="Choose priority">
+                <input type="text" class="new-goal__description" v-model="newGoal.description" placeholder="Description">
             </div>
             <div class="btn" @click="submitGoal">Create Goal!</div>
         </article>
@@ -16,26 +17,32 @@
 
 <script>
 import { reactive } from 'vue';
-import { InteractionForm } from '../utils/classes/interactionForm.js';
+import { Goal } from '../utils/classes/goal.js';
+import { useStore } from 'vuex';
 
 export default {
     name: 'UniversalForm',
-    emits: ['close'],
     props: {
         appointment: String
     },
-    setup() {
-        const values = reactive({ field1: '', field2: '' });
+    setup(props, { emit }) {
+        const newGoal = reactive({ 
+            goalPriority: 0,
+            goalName: '', 
+            description: '' 
+        });
+        const store = useStore();
 
         function submitGoal() {
-            const {field1: name, field2: description} = values;
-            new InteractionForm('create:goal', { name, description });
-            values.field1 = ''
-            values.field2 = ''
+            const { goalPriority, goalName, description } = newGoal;
+            store.commit('addGoal', new Goal(4, goalPriority, goalName, description));
+            newGoal.goalName = '';
+            newGoal.description = '';
+            emit('close');
         }
 
         return {
-            values,
+            newGoal,
             submitGoal
         }
     }

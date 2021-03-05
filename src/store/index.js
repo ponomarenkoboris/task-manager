@@ -62,7 +62,11 @@ export default createStore({
       }
     ]
   },
-  mutations: {},
+  mutations: {
+    addGoal(state, payload){
+      state.goals.push(payload);
+    }
+  },
   actions: {},
   modules: {},
   getters: {

@@ -1,5 +1,7 @@
 <template>
-    <slot></slot>
+    <section id="reg-page">
+        <h1>hi registration</h1>
+    </section>
 </template>
 
 <script>
@@ -8,6 +10,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+#reg-page {
+    background-color: red;
+    color: black;
+}
 </style>

@@ -1,27 +1,29 @@
 <template>
+  <div id="emptylayout">
     <div id="nav">
-        <router-link to="/signin">SignIn</router-link> |
-        <router-link to="/signup">SignUp</router-link>
+      <router-link to="/welcomToAppTS/signin">SignIn</router-link> |
+      <router-link to="/welcomToAppTS/signup">SignUp</router-link> 
     </div>
+    <router-view />
+  </div>
 </template>
 
 <script>
 export default {
-    name: 'EmptyLayout'
+  name: 'EmptyLayout'
 }
 </script>
 
 <style lang="scss" scoped>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
 }
 
 #nav {
   padding: 30px;
+  display: flex;
+  justify-content: center;
 
   a {
     font-weight: bold;
@@ -31,5 +33,8 @@ export default {
       color: #42b983;
     }
   }
+}
+#emptylayout {
+  height: 100%;
 }
 </style>

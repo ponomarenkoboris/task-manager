@@ -1,13 +1,14 @@
 export class Goal {
 
-    constructor(priority, name, tasks = []) {
+    constructor(id, priority, name, tasks = []) {
+        this.id = id;
         this.priority = priority;
         this.name = name;
         this.tasks = tasks
     }
 
-    test(indx) {
-        alert(indx)
+    testMethod() {
+        alert(JSON.stringify(this.tasks))
     }
 
     returnTasks() {
