@@ -1,9 +1,9 @@
 <template>
     <div class="container">
-        <article class="universal-wrapper">
+        <article ref="modalWind" class="universal-wrapper">
             <div class="title-wrapper">
                 <p><strong>{{ appointment }}</strong></p>
-                <p @click="$emit('close')" class="close-card-icon">&times;</p>
+                <p ref="closeModalBtn" class="close-card-icon">&times;</p>
             </div>
             <div class="form-wrapper">
                 <input type="text" class="new-goal__name" v-model="newGoal.goalName" placeholder="Goal name">
@@ -16,9 +16,10 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import { Goal } from '../utils/classes/goal.js';
 import { useStore } from 'vuex';
+import { useEventListener, onClickOutside } from '@vueuse/core';
 
 export default {
     name: 'UniversalForm',
@@ -26,12 +27,23 @@ export default {
         appointment: String
     },
     setup(props, { emit }) {
+        const modalWind = ref(null);
+        const closeModalBtn = ref(null);
+        const store = useStore();
+
+        useEventListener(closeModalBtn, 'click', () => {
+            emit('closeModal');
+        });
+
+        onClickOutside(modalWind, () => {
+            emit('closeModal');
+        });
+
         const newGoal = reactive({ 
             goalPriority: 0,
             goalName: '', 
             description: '' 
         });
-        const store = useStore();
 
         function submitGoal() {
             const { goalPriority, goalName, description } = newGoal;
@@ -43,7 +55,9 @@ export default {
 
         return {
             newGoal,
-            submitGoal
+            submitGoal,
+            modalWind,
+            closeModalBtn
         }
     }
 }

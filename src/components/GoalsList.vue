@@ -3,7 +3,7 @@
         <article class="main-card">
             <div class="main-card-title-wrapper">
                 <p class="main-card__title">Goals</p>
-                <button class="new-goal-btn" @click="showForm">Create new</button>
+                <button class="new-goal-btn" ref="createGoalBtn">Create new</button>
             </div>
             <article class="main-card__goals-list">
                 <div class="goal-wrapper" v-for="(goal, idx) in goals" :key="idx" @click="testMove(goal)">
@@ -19,7 +19,7 @@
                 </div>
             </article>
         </article>
-        <UniversalForm v-if="formController" @close="showForm" :appointment="'Creat new Goal!'"/>
+        <UniversalForm v-if="formController" @closeModal="closeModal" :appointment="'Creat new Goal!'"/>
     </section>
 </template>
 
@@ -27,6 +27,7 @@
 import { Goal } from '../utils/classes/goal.js';
 import UniversalForm from '../components/UniversalForm';
 import { ref, computed } from 'vue';
+import { useEventListener } from '@vueuse/core';
 import { useStore } from 'vuex';
 
 export default {
@@ -37,24 +38,30 @@ export default {
     setup() {
         const store = useStore();
         const formController = ref(false);
+        const createGoalBtn = ref(null);
+        
+        useEventListener(createGoalBtn, 'click', () => {
+            formController.value = true;
+        });
+
         const goals = computed(() => {
             return store.getters.goals.map(item => new Goal(item.id, item.priority, item.name, item.tasks));
         });
         
         function testMove (choosenGoal) {
             choosenGoal.testMethod();
-
         }
 
-        function showForm() {
-            formController.value = !formController.value
+        const closeModal = () => {
+            formController.value = false;
         }
 
         return {
             testMove,
             formController,
-            showForm,
-            goals
+            createGoalBtn,
+            goals,
+            closeModal    
         }
     }
 }
