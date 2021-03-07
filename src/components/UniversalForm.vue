@@ -16,6 +16,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 import { ref, reactive } from 'vue';
 import { Goal } from '../utils/classes/goal.js';
 import { useStore } from 'vuex';
@@ -50,7 +51,8 @@ export default {
             store.commit('addGoal', new Goal(4, goalPriority, goalName, description));
             newGoal.goalName = '';
             newGoal.description = '';
-            emit('close');
+            console.log('all goals: ', store.getters.goals)
+            emit('closeModal');
         }
 
         return {

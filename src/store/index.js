@@ -44,7 +44,7 @@ export default createStore({
       {
         id: 3,
         priority: 3,
-        name: 'Third issue',
+        name: 'last issue',
         tasks: [
           {
             id: 1,

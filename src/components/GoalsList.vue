@@ -3,10 +3,10 @@
         <article class="main-card">
             <div class="main-card-title-wrapper">
                 <p class="main-card__title">Goals</p>
-                <button class="new-goal-btn" ref="createGoalBtn">Create new</button>
+                <button class="new-goal-btn" ref="create-new-goal">Create new</button>
             </div>
             <article class="main-card__goals-list">
-                <div class="goal-wrapper" v-for="(goal, idx) in goals" :key="idx" @click="testMove(goal)">
+                <div class="goal-wrapper" v-for="(goal, idx) in renderGoalsOnPage" :key="idx" @click="testMove(goal)">
                     <div class="goal-priority-wrapper">
                         <p class="goal-priority">{{ goal.priority }}</p>
                     </div>
@@ -18,16 +18,29 @@
                     </div>
                 </div>
             </article>
+            <article v-if="totalPages > 1" class="total-goasl-wrapper">
+                <p class="total__goals"><storng>TOTAL</storng>: {{ allGoals.length }}</p>
+                <div class="pugination-controllers">
+                    <span class="controller-wrapper">
+                        <i ref="control-prev" class="fas fa-angle-left"></i>
+                    </span>
+                    <p class="pugination__counter">{{ currentPage }} / {{ totalPages }}</p>
+                    <span class="controller-wrapper">
+                        <i ref="control-next" class="fas fa-angle-right"></i>
+                    </span>
+                </div>
+            </article>
         </article>
         <UniversalForm v-if="formController" @closeModal="closeModal" :appointment="'Creat new Goal!'"/>
     </section>
 </template>
 
 <script>
+/* eslint-disable */
 import { Goal } from '../utils/classes/goal.js';
 import UniversalForm from '../components/UniversalForm';
-import { ref, computed } from 'vue';
-import { useEventListener } from '@vueuse/core';
+import { ref, computed, watch, watchEffect } from 'vue';
+import { useEventListener, templateRef } from '@vueuse/core';
 import { useStore } from 'vuex';
 
 export default {
@@ -38,15 +51,45 @@ export default {
     setup() {
         const store = useStore();
         const formController = ref(false);
-        const createGoalBtn = ref(null);
+        const createNewGoal = templateRef('create-new-goal');
         
-        useEventListener(createGoalBtn, 'click', () => {
+        const allGoals = computed(() => {
+            return store.getters.goals.map(item => new Goal(item.id, item.priority, item.name, item.tasks));
+        });
+        const controllerPrev = templateRef('control-prev');
+        const controllerNext = templateRef('control-next');
+        const maxOnPage = 10;
+        const totalPages = computed(() => Math.ceil(allGoals.value.length / maxOnPage));
+        const currentPage = ref(1); // default value
+        const renderGoalsOnPage = ref(allGoals.value.slice(0, maxOnPage));// default value
+
+        watchEffect(() => renderGoalsOnPage.value = allGoals.value.slice(0, maxOnPage));
+
+        watch(currentPage, (curr, prev) => {
+            if (curr > prev) {
+                renderGoalsOnPage.value = allGoals.value.slice(prev * maxOnPage, curr * maxOnPage);
+                return;
+            }
+            if (curr < prev) {
+                renderGoalsOnPage.value = allGoals.value.slice((curr - 1) * maxOnPage, (prev - 1) * maxOnPage);
+                return;
+            }
+        });
+
+        useEventListener(controllerNext, 'click', () => {
+            if (currentPage.value === totalPages.value) return;
+            ++currentPage.value;
+        });
+
+        useEventListener(controllerPrev, 'click', () => {
+            if (currentPage.value === 1) return;
+            --currentPage.value;
+        });
+        
+        useEventListener(createNewGoal, 'click', () => {
             formController.value = true;
         });
 
-        const goals = computed(() => {
-            return store.getters.goals.map(item => new Goal(item.id, item.priority, item.name, item.tasks));
-        });
         
         function testMove (choosenGoal) {
             choosenGoal.testMethod();
@@ -59,9 +102,11 @@ export default {
         return {
             testMove,
             formController,
-            createGoalBtn,
-            goals,
-            closeModal    
+            allGoals,
+            renderGoalsOnPage,
+            closeModal,
+            totalPages,
+            currentPage
         }
     }
 }
@@ -123,6 +168,27 @@ export default {
             .goal-text-wrapper {
                 width: 80%;
                 text-align: center;
+            }
+        }
+    }
+
+    .total-goasl-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .pugination-controllers {
+            display: flex;
+
+            .controller-wrapper {
+                font-size: 20px;
+                cursor: pointer;
+            }
+
+            .pugination__counter {
+                display: block;
+                margin: 0 10px;
             }
         }
     }
