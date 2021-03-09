@@ -11,7 +11,8 @@
         </section>
         <section class="goals-list-container">
             <section class="goals-list-wrapper">
-                <GoalsList />
+                <GoalsList @showDesc="showDesc" />
+                <GoalDescription :name="showingDesc.name" :description="showingDesc.description" :priority="showingDesc.priority" />
             </section>
         </section>
     </section>
@@ -19,16 +20,24 @@
 
 <script>
 import GoalsList from '../components/GoalsList';
+import GoalDescription from '../components/GoalDescription';
 import { useOnline } from '@vueuse/core';
+import { ref } from 'vue';
 
 export default {
     name: 'TaskTracker',
     components: {
-        GoalsList
+        GoalsList,
+        GoalDescription
     },
     setup() {
         const isOnline = useOnline();
-        return { isOnline }
+        const showingDesc = ref({});
+        function showDesc(currentGoal) {
+            console.log(currentGoal);
+            showingDesc.value = {...currentGoal};
+        }
+        return { isOnline, showDesc, showingDesc }
     }
 }
 </script>
@@ -53,6 +62,11 @@ export default {
         .active {
             color: #4bf03c;
         }
+    }
+
+    .goals-list-wrapper {
+        display: flex;
+        justify-content: space-around;        
     }
 }
 </style>

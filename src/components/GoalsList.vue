@@ -4,11 +4,11 @@
             <div class="main-card-title-wrapper">
                 <p class="main-card__title">Goals</p>
                 <div class="pugination-controllers-wrapper">
-                    <div v-show="totalPages.length > 1" class="pugination-controllers">
+                    <div v-show="totalPages > 1" class="pugination-controllers">
                         <span class="controller-wrapper">
                             <i ref="control-prev" class="fas fa-angle-left"></i>
                         </span>
-                        <p class="pugination__counter">{{ currentPage }} / {{ totalPages }}</p>
+                        <p class="pugination__counter">{{ currentPage + 1 }} / {{ totalPages }}</p>
                         <span class="controller-wrapper">
                             <i ref="control-next" class="fas fa-angle-right"></i>
                         </span>
@@ -18,7 +18,7 @@
             </div>
             <div class="headlines-wrapper">
                 <div class="headline-item">
-                    <p ref="priority-sort" class="goal__status priority">Priority</p>
+                    <p class="goal__status">Priority</p>
                 </div>
                 <div class="headline-item center">
                     <p class="goal__name">Goal name</p>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <article class="main-card__goals-list">
-                <div class="goal-wrapper" v-for="(goal, idx) in renderGoalsOnPage" :key="idx" @click="testMove(goal)">
+                <div class="goal-wrapper" v-for="(goal, idx) in renderGoals" :key="idx" @click="$emit('showDesc', goal)">
                     <div class="goal-priority-wrapper">
                         <p class="goal-priority">{{ goal.priority }}</p>
                     </div>
@@ -41,18 +41,17 @@
                 </div>
             </article>
             <article v-if="totalPages > 1" class="total-goals-wrapper">
-                <p class="total__goals"><strong>TOTAL</strong>: {{ allGoals.length }}</p>
+                <p class="total__goals"><strong>TOTAL</strong>: {{ goalsList.length }}</p>
             </article>
         </article>
-        <UniversalForm v-if="formController" @closeModal="closeModal" :appointment="'Creat new Goal!'"/>
+        <UniversalForm v-if="formControl" @closeModal="closeModal" :appointment="'Creat new Goal!'"/>
     </section>
 </template>
 
 <script>
 /* eslint-disable */
-import { Goal } from '../utils/classes/goal.js';
 import UniversalForm from '../components/UniversalForm';
-import { ref, computed, watch, watchEffect } from 'vue';
+import { ref, computed } from 'vue';
 import { useEventListener, templateRef } from '@vueuse/core';
 import { useStore } from 'vuex';
 
@@ -61,70 +60,50 @@ export default {
     components: {
         UniversalForm
     },
+    emits: ['showDesc'],
     setup() {
-        // TODO add goals sort by priority
-        const store = useStore();
-        const formController = ref(false);
-        const createNewGoal = templateRef('create-new-goal');
-        const allGoals = computed(() => {
-            return store.getters.goals.map(item => new Goal(item.id, item.priority, item.name, item.tasks));
-        });
-        const controllerPrev = templateRef('control-prev');
+        // refs 
+        const openModal = templateRef('create-new-goal');
         const controllerNext = templateRef('control-next');
-        const prioritySort = templateRef('priority-sort');
+        const controllerPrev = templateRef('control-prev');
+        // conroller
+        const formControl = ref(false);
+        // all goals
+        const goalsList = computed(() => useStore().getters.goals);
+        // pugination variables
         const maxOnPage = 10;
-        const totalPages = computed(() => Math.ceil(allGoals.value.length / maxOnPage));
-        const currentPage = ref(1); // default value
-        const renderGoalsOnPage = ref(allGoals.value.slice(0, maxOnPage));// default value
+        const totalPages = computed(() => Math.ceil(goalsList.value.length / maxOnPage));
+        const currentPage = ref(0);
+        const renderGoals = computed(() => goalsList.value.slice(currentPage.value * maxOnPage, currentPage.value * maxOnPage + maxOnPage));
 
-        watchEffect(() => renderGoalsOnPage.value = allGoals.value.slice(0, maxOnPage));
-
-        watch(currentPage, (curr, prev) => {
-            if (curr > prev) {
-                renderGoalsOnPage.value = allGoals.value.slice(prev * maxOnPage, curr * maxOnPage);
-                return;
-            }
-            if (curr < prev) {
-                renderGoalsOnPage.value = allGoals.value.slice((curr - 1) * maxOnPage, (prev - 1) * maxOnPage);
-                return;
-            }
+        useEventListener(openModal, 'click', () => {
+            formControl.value = true;
         });
-
-        useEventListener(prioritySort, 'click', () => {
-            console.log('sort function')
-        });
-
+        
+        // show goal description
+        
+        // close modal
+        function closeModal() {
+            formControl.value = false;
+        }
         useEventListener(controllerNext, 'click', () => {
-            if (currentPage.value === totalPages.value) return;
+            if (currentPage.value === totalPages.value - 1) return;
             ++currentPage.value;
         });
-
+        // prev page
         useEventListener(controllerPrev, 'click', () => {
-            if (currentPage.value === 1) return;
+            if (currentPage.value === 0) return;
             --currentPage.value;
-        });
-        
-        useEventListener(createNewGoal, 'click', () => {
-            formController.value = true;
-        });
-
-        
-        function testMove (choosenGoal) {
-            choosenGoal.testMethod();
-        }
-
-        const closeModal = () => {
-            formController.value = false;
-        }
+        })
+        // pugination logic (end)
 
         return {
-            testMove,
-            formController,
-            allGoals,
-            renderGoalsOnPage,
-            closeModal,
+            currentPage,
             totalPages,
-            currentPage
+            closeModal,
+            renderGoals,
+            formControl,
+            goalsList,
         }
     }
 }
@@ -132,7 +111,7 @@ export default {
 
 <style lang="scss" scoped>
 .main-card {
-    width: 25%;
+    width: 465px;
     max-height: 681px;
     display: flex;
     flex-direction: column;
@@ -203,10 +182,6 @@ export default {
             cursor: default;
         }
 
-        .priority {
-            cursor: pointer;
-        }
-
         .center {
             width: 70%;
             text-align: center;
@@ -219,7 +194,13 @@ export default {
         .goal-wrapper {
             display: flex;
             justify-content: space-between;
+            cursor: pointer;
             border-top: 1px solid #ccc;
+            transition: .22s ease-in-out;
+
+            &:hover {
+                background-color: #ccc;
+            }
 
             .goal-priority-wrapper,
             .goal-percentage-of-completion-wrapper {
@@ -234,6 +215,10 @@ export default {
     }
 
     .total-goals-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border-top: 1px solid #ccc;
     }
 }

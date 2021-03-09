@@ -8,8 +8,8 @@
                 </span>
             </div>
             <div class="form-wrapper">
-                <input type="text" class="new-goal__name" v-model="newGoal.goalName" placeholder="Goal name">
-                <input type="number" class="new-goal__priority" v-model="newGoal.goalPriority" placeholder="Choose priority (from 1 to whatever you want)">
+                <input type="text" class="new-goal__name" v-model="newGoal.name" placeholder="Goal name">
+                <input type="number" class="new-goal__priority" v-model="newGoal.priority" placeholder="Choose priority (from 1 to whatever you want)">
                 <input type="text" class="new-goal__description" v-model="newGoal.description" placeholder="Description">
             </div>
             <div class="create-btn-wrapper">
@@ -22,7 +22,6 @@
 <script>
 /* eslint-disable */
 import { ref, reactive } from 'vue';
-import { Goal } from '../utils/classes/goal.js';
 import { useStore } from 'vuex';
 import { useEventListener, onClickOutside } from '@vueuse/core';
 
@@ -45,18 +44,18 @@ export default {
         });
 
         const newGoal = reactive({ 
-            goalPriority: '',
-            goalName: '', 
+            priority: '',
+            name: '', 
             description: '' 
         });
 
         function submitGoal() {
-            const { goalPriority, goalName, description } = newGoal;
-            if (!description.trim() || !goalName.trim()) return;
-            store.commit('addGoal', new Goal(4, goalPriority, goalName, description));
-            newGoal.goalName = '';
+            const { priority, name, description } = newGoal;
+            if (!priority.trim() || !name.trim() || !description.trim()) return;
+            store.commit('addGoal', { priority, name, description });
+            newGoal.name = '';
+            newGoal.priority = '';
             newGoal.description = '';
-            console.log('all goals: ', store.getters.goals)
             emit('closeModal');
         }
 

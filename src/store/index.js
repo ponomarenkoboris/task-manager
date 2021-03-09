@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import descriptionCard from './decsCard.js';
 
 export default createStore({
   state: {
@@ -44,7 +45,7 @@ export default createStore({
       {
         id: 3,
         priority: 3,
-        name: 'last issue',
+        name: '3 issue',
         tasks: [
           {
             id: 1,
@@ -68,10 +69,12 @@ export default createStore({
     }
   },
   actions: {},
-  modules: {},
+  modules: {
+    descriptionCard
+  },
   getters: {
     goals(state) {
-      return state.goals
+      return state.goals.sort((a, b) => a.priority < b.priority ? 1 : -1);
     }
   }
 });
