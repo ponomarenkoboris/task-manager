@@ -11,8 +11,9 @@
         </section>
         <section class="goals-list-container">
             <section class="goals-list-wrapper">
-                <GoalsList @showDesc="showDesc" />
-                <GoalDescription :name="showingDesc.name" :description="showingDesc.description" :priority="showingDesc.priority" />
+                <GoalsList @showDesc="showDesc" @modalStatus="modalStatus"/>
+                <GoalDescription v-if="showingDesc" @modalStatus="modalStatus" :name="showingDesc.name" :description="showingDesc.description" :priority="showingDesc.priority" />
+                <UniversalForm v-if="modalConfig.isOpen" @modalStatus="modalStatus" :appointment="modalConfig.appointment"/>
             </section>
         </section>
     </section>
@@ -21,23 +22,33 @@
 <script>
 import GoalsList from '../components/GoalsList';
 import GoalDescription from '../components/GoalDescription';
+import UniversalForm from '../components/UniversalForm';
 import { useOnline } from '@vueuse/core';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 
 export default {
     name: 'TaskTracker',
     components: {
         GoalsList,
-        GoalDescription
+        GoalDescription,
+        UniversalForm
     },
     setup() {
         const isOnline = useOnline();
-        const showingDesc = ref({});
+        const showingDesc = ref('');
+        const modalConfig = reactive({
+            isOpen: false,
+            appointment: ''
+        });
         function showDesc(currentGoal) {
-            console.log(currentGoal);
             showingDesc.value = {...currentGoal};
         }
-        return { isOnline, showDesc, showingDesc }
+        function modalStatus(config) {
+            const { isOpen, appointment } = config;
+            modalConfig.isOpen = isOpen;
+            modalConfig.appointment = appointment
+        }
+        return { isOnline, showDesc, showingDesc, modalConfig, modalStatus }
     }
 }
 </script>

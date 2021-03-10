@@ -1,14 +1,31 @@
 const { Schema, model } = require('mongoose');
 
-const goalSchema = new Schema({
-    name: {
+const user = new Schema({
+    userName: {
         type: String,
-        require: true
+        requried: true
     },
-    priority: {
+    userEmail: {
         type: String,
-        default: 1 
-    }
+        requried: true
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    goals: [
+        {
+            id: Number,
+            priority: Number,
+            name: String,
+            tasks: [
+                {
+                    id: Number,
+                    description: String
+                }
+            ]
+        },
+    ]
 })
 
-module.exports = model('Goal', goalSchema);
+module.exports = model('User', user);

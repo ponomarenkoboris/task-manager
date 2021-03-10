@@ -7,13 +7,37 @@
                     <i class="fas fa-times"></i>
                 </span>
             </div>
-            <div class="form-wrapper">
+            <div v-if="appointment === 'Create new goal'" class="form-wrapper">
                 <input type="text" class="new-goal__name" v-model="newGoal.name" placeholder="Goal name">
                 <input type="number" class="new-goal__priority" v-model="newGoal.priority" placeholder="Choose priority (from 1 to whatever you want)">
                 <input type="text" class="new-goal__description" v-model="newGoal.description" placeholder="Description">
             </div>
-            <div class="create-btn-wrapper">
+            <div v-if="appointment === 'Create new goal'" class="create-btn-wrapper">
                 <button class="btn-create" @click="submitGoal">Create Goal!</button>
+            </div>
+            <!-- add new task -->
+            <div v-if="appointment === 'Add new task'" class="form-wrapper">
+                <input type="text" class="new-task__title" placeholder="Enter task name...">
+                <input type="text" class="new-task-description" placeholder="Enter task description...">
+            </div>
+            <!-- rename goal -->
+            <div v-if="appointment === 'Rename goal'" class="form-wrapper">
+                <p class="prev-goal-name">PREV-TASK-NAME</p>
+                <input type="text" class="new-goal__name" placeholder="Enter new name...">
+            </div>
+            <!-- rewrite description -->
+            <div v-if="appointment === 'Rewrite Description'" class="form-wrapper">
+                <input type="text" class="new-description" placeholder="Enter new description...">
+            </div>
+            <!-- remove goal -->
+            <div v-if="appointment === 'Remove goal'" class="form-wrapper">
+                <div class="input-wrapper">
+                    <p>Are you sure?</p>
+                    <div class="buttons-wrapper">
+                        <button class="suggested-answer">Yes, I am.</button>
+                        <button class="negative-answer">No, I am not.</button>
+                    </div>
+                </div>
             </div>
         </article>
     </div>
@@ -28,19 +52,24 @@ import { useEventListener, onClickOutside } from '@vueuse/core';
 export default {
     name: 'UniversalForm',
     props: {
-        appointment: String
+        appointment: {
+            type: String,
+            required: true
+        },
+        currentGoal: Object
     },
     setup(props, { emit }) {
         const modalWind = ref(null);
         const closeModalBtn = ref(null);
         const store = useStore();
+        const closeStatus = { isOpen: false, appointment: '' };
 
         useEventListener(closeModalBtn, 'click', () => {
-            emit('closeModal');
+            emit('modalStatus', closeStatus);
         });
 
         onClickOutside(modalWind, () => {
-            emit('closeModal');
+            emit('modalStatus', closeStatus);
         });
 
         const newGoal = reactive({ 
@@ -56,7 +85,7 @@ export default {
             newGoal.name = '';
             newGoal.priority = '';
             newGoal.description = '';
-            emit('closeModal');
+            emit('modalStatus', closeStatus);
         }
 
         return {

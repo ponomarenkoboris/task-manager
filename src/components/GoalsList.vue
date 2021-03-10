@@ -44,7 +44,6 @@
                 <p class="total__goals"><strong>TOTAL</strong>: {{ goalsList.length }}</p>
             </article>
         </article>
-        <UniversalForm v-if="formControl" @closeModal="closeModal" :appointment="'Creat new Goal!'"/>
     </section>
 </template>
 
@@ -61,13 +60,11 @@ export default {
         UniversalForm
     },
     emits: ['showDesc'],
-    setup() {
+    setup(props, { emit }) {
         // refs 
         const openModal = templateRef('create-new-goal');
         const controllerNext = templateRef('control-next');
         const controllerPrev = templateRef('control-prev');
-        // conroller
-        const formControl = ref(false);
         // all goals
         const goalsList = computed(() => useStore().getters.goals);
         // pugination variables
@@ -77,15 +74,11 @@ export default {
         const renderGoals = computed(() => goalsList.value.slice(currentPage.value * maxOnPage, currentPage.value * maxOnPage + maxOnPage));
 
         useEventListener(openModal, 'click', () => {
-            formControl.value = true;
+            emit('modalStatus', { isOpen: true, appointment: 'Create new goal' });
         });
         
         // show goal description
         
-        // close modal
-        function closeModal() {
-            formControl.value = false;
-        }
         useEventListener(controllerNext, 'click', () => {
             if (currentPage.value === totalPages.value - 1) return;
             ++currentPage.value;
@@ -100,9 +93,7 @@ export default {
         return {
             currentPage,
             totalPages,
-            closeModal,
             renderGoals,
-            formControl,
             goalsList,
         }
     }
